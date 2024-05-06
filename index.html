@@ -10,6 +10,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script> 
     <title>Document</title>
+    <style>
+        .fc-left button,
+        .fc-center button,
+        .fc-right button {
+            background-color: #7abbf8;
+            color: black;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -23,8 +31,16 @@
                 <div class="modal-body">
                     <form id="eventForm">
                         <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">New Event</label>
+                            <label for="recipient-name" class="col-form-label">Event Title</label>
                             <input type="text" class="form-control" id="recipient-name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="event-time" class="col-form-label">Event Time</label>
+                            <input type="time" class="form-control" id="event-time">
+                        </div>
+                        <div class="mb-3">
+                            <label for="event-color" class="col-form-label">Event Color</label>
+                            <input type="color" class="form-control" id="event-color">
                         </div>
                     </form>
                 </div>
@@ -38,7 +54,6 @@
 
     <script>
         $(document).ready(function() {
-            // Load events from local storage
             var eventsData = localStorage.getItem('eventsData');
             var events = eventsData ? JSON.parse(eventsData) : [];
 
@@ -49,19 +64,28 @@
                     $('#exampleModal').modal('toggle');
                     $('#saveEventBtn').unbind().click(function(){
                         var title = $('#recipient-name').val();
-                        if (title) {
+                        var time = $('#event-time').val();
+                        var color = $('#event-color').val();
+                        if (title && time) {
+                            var startWithTime = moment(start.format('YYYY-MM-DD') + 'T' + time).format();
+                            var endWithTime = moment(start.format('YYYY-MM-DD') + 'T' + time).format(); 
                             var eventData = {
                                 title: title,
-                                start: start,
-                                end: end,
-                                allDay: true
+                                start: startWithTime,
+                                end: endWithTime,
+                                allDay: false, // Set allDay to false since we're adding time
+                                color: color // Set the background color of the event
                             };
-                            $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
+                            $('#calendar').fullCalendar('renderEvent', eventData, true);
                             events.push(eventData);
                             localStorage.setItem('eventsData', JSON.stringify(events));
+                            $('#exampleModal').modal('hide');
+                            $('#recipient-name').val('');
+                            $('#event-time').val('');
+                            $('#event-color').val('#000000'); // Reset color picker to default
+                        } else {
+                            alert("Please provide a title and select a time for the event.");
                         }
-                        $('#exampleModal').modal('hide');
-                        $('#recipient-name').val('');
                     });
                 },
                 header: {
@@ -76,15 +100,13 @@
                     day: 'Day',
                     list: 'List'
                 },
-                editable: true, // Enable drag and drop
+                editable: true, 
                 events: events,
                 eventDrop: function(event, delta, revertFunc) {
-                    // Handle event drop here, you can make AJAX call to update event in database
                     updateEventsData();
                     alert(event.title + " was dropped on " + event.start.format());
                 },
                 eventRemove: function(event) {
-                    // Handle event removal here
                     updateEventsData();
                 }
             });
