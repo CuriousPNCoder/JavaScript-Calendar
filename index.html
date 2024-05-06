@@ -20,27 +20,31 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container p-3">
         <div id="calendar"></div>
     </div>
     <br>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Event Details</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Add Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="eventForm">
                         <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Event Title</label>
-                            <input type="text" class="form-control" id="recipient-name">
+                            <label for="event-title" class="">Event Title</label>
+                            <input type="text" class="form-control" id="event-title">
                         </div>
                         <div class="mb-3">
-                            <label for="event-time" class="col-form-label">Event Time</label>
-                            <input type="time" class="form-control" id="event-time">
+                            <label for="event-start" class="col-form-label">Start Time</label>
+                            <input type="time" class="form-control" id="event-start">
+                        </div>
+                        <div class="mb-3">
+                            <label for="event-end" class="col-form-label">End Time</label>
+                            <input type="time" class="form-control" id="event-end">
                         </div>
                         <div class="mb-3">
                             <label for="event-color" class="col-form-label">Event Color</label>
@@ -55,8 +59,37 @@
             </div>
         </div>
     </div>
-    
-    
+
+    <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Event Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="eventDetailsForm">
+                        <div class="mb-3">
+                            <label for="event-title" class="">Event Title</label>
+                            <input type="text" class="form-control" id="event-details-title" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="event-start" class="col-form-label">Start Time</label>
+                            <input type="text" class="form-control" id="event-details-start" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="event-end" class="col-form-label">End Time</label>
+                            <input type="text" class="form-control" id="event-details-end" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="event-color" class="col-form-label">Event Color</label>
+                            <input type="color" class="form-control" id="event-details-color" readonly>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         $(document).ready(function() {
@@ -67,32 +100,41 @@
                 selectable: true,
                 selectHelper: true,
                 select: function(start, end) {
-                    $('#exampleModal').modal('toggle');
+                    $('#addEventModal').modal('toggle');
                     $('#saveEventBtn').unbind().click(function(){
-                        var title = $('#recipient-name').val();
-                        var time = $('#event-time').val();
+                        var title = $('#event-title').val();
+                        var startTime = $('#event-start').val();
+                        var endTime = $('#event-end').val();
                         var color = $('#event-color').val();
-                        if (title && time) {
-                            var startWithTime = moment(start.format('YYYY-MM-DD') + 'T' + time).format();
-                            var endWithTime = moment(start.format('YYYY-MM-DD') + 'T' + time).format(); 
+                        if (title && startTime && endTime) {
+                            var startWithTime = moment(start.format('YYYY-MM-DD') + 'T' + startTime).format();
+                            var endWithTime = moment(start.format('YYYY-MM-DD') + 'T' + endTime).format(); 
                             var eventData = {
                                 title: title,
                                 start: startWithTime,
                                 end: endWithTime,
-                                allDay: false, // Set allDay to false since we're adding time
-                                color: color // Set the background color of the event
+                                allDay: false, 
+                                color: color
                             };
                             $('#calendar').fullCalendar('renderEvent', eventData, true);
                             events.push(eventData);
                             localStorage.setItem('eventsData', JSON.stringify(events));
-                            $('#exampleModal').modal('hide');
-                            $('#recipient-name').val('');
-                            $('#event-time').val('');
-                            $('#event-color').val('#000000'); // Reset color picker to default
+                            $('#addEventModal').modal('hide');
+                            $('#event-title').val('');
+                            $('#event-start').val('');
+                            $('#event-end').val('');
+                            $('#event-color').val('#000000'); 
                         } else {
-                            alert("Please provide a title and select a time for the event.");
+                            alert("Please provide all the necessary details for the event.");
                         }
                     });
+                },
+                eventClick: function(calEvent, jsEvent, view) {
+                    $('#event-details-title').val(calEvent.title);
+                    $('#event-details-start').val(moment(calEvent.start).format('YYYY-MM-DD HH:mm:ss'));
+                    $('#event-details-end').val(moment(calEvent.end).format('YYYY-MM-DD HH:mm:ss'));
+                    $('#event-details-color').val(calEvent.color);
+                    $('#eventDetailsModal').modal('show');
                 },
                 header: {
                     left: 'month, agendaWeek, agendaDay, list',
