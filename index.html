@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script> 
+    <title>Document</title>
+    <style>
+        .fc-left button,
+        .fc-center button,
+        .fc-right button {
+            background-color: #7abbf8;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="calendar"></div>
+    </div>
+    <br>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form id="eventForm">
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Event Title</label>
+                            <input type="text" class="form-control" id="recipient-name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="event-time" class="col-form-label">Event Time</label>
+                            <input type="time" class="form-control" id="event-time">
+                        </div>
+                        <div class="mb-3">
+                            <label for="event-color" class="col-form-label">Event Color</label>
+                            <input type="color" class="form-control" id="event-color">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveEventBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            var eventsData = localStorage.getItem('eventsData');
+            var events = eventsData ? JSON.parse(eventsData) : [];
+
+            $('#calendar').fullCalendar({
+                selectable: true,
+                selectHelper: true,
+                select: function(start, end) {
+                    $('#exampleModal').modal('toggle');
+                    $('#saveEventBtn').unbind().click(function(){
+                        var title = $('#recipient-name').val();
+                        var time = $('#event-time').val();
+                        var color = $('#event-color').val();
+                        if (title && time) {
+                            var startWithTime = moment(start.format('YYYY-MM-DD') + 'T' + time).format();
+                            var endWithTime = moment(start.format('YYYY-MM-DD') + 'T' + time).format(); 
+                            var eventData = {
+                                title: title,
+                                start: startWithTime,
+                                end: endWithTime,
+                                allDay: false, // Set allDay to false since we're adding time
+                                color: color // Set the background color of the event
+                            };
+                            $('#calendar').fullCalendar('renderEvent', eventData, true);
+                            events.push(eventData);
+                            localStorage.setItem('eventsData', JSON.stringify(events));
+                            $('#exampleModal').modal('hide');
+                            $('#recipient-name').val('');
+                            $('#event-time').val('');
+                            $('#event-color').val('#000000'); // Reset color picker to default
+                        } else {
+                            alert("Please provide a title and select a time for the event.");
+                        }
+                    });
+                },
+                header: {
+                    left: 'month, agendaWeek, agendaDay, list',
+                    center: 'title',
+                    right: 'prev, today, next'
+                },
+                buttonText: {
+                    today: 'Today',
+                    month: 'Month',
+                    week: 'Week',
+                    day: 'Day',
+                    list: 'List'
+                },
+                editable: true, 
+                events: events,
+                eventDrop: function(event, delta, revertFunc) {
+                    updateEventsData();
+                    alert(event.title + " was dropped on " + event.start.format());
+                },
+                eventRemove: function(event) {
+                    updateEventsData();
+                }
+            });
+
+            function updateEventsData() {
+                localStorage.setItem('eventsData', JSON.stringify(events));
+            }
+        });
+    </script> 
+</body>
+</html>
