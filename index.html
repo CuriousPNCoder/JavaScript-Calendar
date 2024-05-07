@@ -127,11 +127,11 @@
                         </div>
                         <div class="mb-1">
                             <label for="event-start" class="col-form-label">Start Time</label>
-                            <input type="time" class="form-control" id="event-start" />
+                            <input type="datetime-local" class="form-control" id="event-start" />
                         </div>
                         <div class="mb-1">
                             <label for="event-end" class="col-form-label">End Time</label>
-                            <input type="time" class="form-control" id="event-end" />
+                            <input type="datetime-local" class="form-control" id="event-end" />
                         </div>
                         <div class="mb-1">
                             <label for="event-color" class="col-form-label">Event Color</label>
@@ -196,20 +196,20 @@
                 selectHelper: true,
                 select: function (start, end) {
                     $("#addEventModal").modal("toggle");
-                    $("#saveEventBtn").unbind().click(function () {
-                        var title = $("#event-title").val();
-                        var startTime = $("#event-start").val();
-                        var endTime = $("#event-end").val();
-                        var color = $("#event-color").val();
-                        if (title && startTime && endTime) {
-                            var startWithTime = moment(start.format("YYYY-MM-DD") + "T" + startTime).format();
-                            var endWithTime = moment(start.format("YYYY-MM-DD") + "T" + endTime).format();
+                   $("#saveEventBtn").unbind().click(function () {
+        var title = $("#event-title").val();
+        var startDate = $("#event-start").val();
+        var endDate = $("#event-end").val();
+        var color = $("#event-color").val();
+        if (title && startDate && endDate) {
+                            // var startWithTime = moment(start.format("YYYY-MM-DD") + "T" + startTime).format();
+                            // var endWithTime = moment(start.format("YYYY-MM-DD") + "T" + endTime).format();
                             var eventData = {
-                                title: title,
-                                start: startWithTime,
-                                end: endWithTime,
-                                allDay: false,
-                                color: color,
+                                  title: title,
+                start: startDate,
+                end: endDate,
+                allDay: false,
+                color: color,
                             };
                             $("#calendar").fullCalendar("renderEvent", eventData, true);
                             events.push(eventData);
