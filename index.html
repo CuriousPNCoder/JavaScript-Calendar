@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
     <title>Document</title>
     <style>
         .fc-left button,
@@ -17,43 +21,91 @@
             background-color: #d3d7db;
             color: black;
         }
+
         .fc-event {
             cursor: pointer;
             border-radius: 5px;
             padding: 5px;
             margin-bottom: 5px;
         }
+
         .fc-event-time {
             font-size: 12px;
         }
+
         .fc-event-title {
             font-weight: bold;
             font-size: 14px;
             margin-top: 5px;
         }
-        .fc-toolbar h2 {
-    margin: 0;
-    font-weight: 500;
-    font-size: 25px;
-    color: #053156;
-}
-.fc-toolbar .fc-state-active, .fc-toolbar .ui-state-active {
-    z-index: 4;
-    background-color: #6092bc;
-    color: white;
-}
-.fc-left button, .fc-center button, .fc-right button {
-    background-color: #ffffff;
-    color: black;
-}
 
+        .fc-toolbar h2 {
+            margin: 0;
+            font-weight: 500;
+            font-size: 25px;
+            color: #053156;
+        }
+
+        .fc-toolbar .fc-state-active,
+        .fc-toolbar .ui-state-active {
+            z-index: 4;
+            background-color: #6092bc;
+            color: white;
+        }
+
+        .fc-left button,
+        .fc-center button,
+        .fc-right button {
+            background-color: #ffffff;
+            color: black;
+        }
+
+        .fc-unthemed .fc-divider,
+        .fc-unthemed .fc-popover .fc-header,
+        .fc-unthemed .fc-list-heading td {
+            background: #fafafa;
+        }
+
+        .fc-list-heading td {
+            font-weight: 500;
+            color: #053156;
+        }
+
+        .fc-unthemed .fc-list-empty {
+            background-color: #fafafa;
+        }
+.modal-title {
+    margin-bottom: 0;
+    line-height: 1.5;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    /* color: #6092bc; */
+    font-size: 26px;
+}
         /* .fc-day-grid-event .fc-content {
     white-space: pre;
     padding: 5px;
     display: grid;
 } */
+.modal-header {
+    display: flex;
+    justify-content: flex-end;
+    border-bottom: none;
+    padding: 11px;
+}
+
+.modal-header .btn-close {
+    margin: 0;
+}
+.modal-body {
+    position: relative;
+    flex: 1 1 auto;
+    padding: 6px 24px 1px 27px;
+}
     </style>
 </head>
+
 <body>
     <div class="container p-3">
         <div id="calendar"></div>
@@ -63,32 +115,37 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <h5 class="modal-title" id="exampleModalLabel">Add Event</h5>
+
                 <div class="modal-body">
                     <form id="eventForm">
-                        <div class="mb-3">
-                            <label for="event-title" class="">Event Title</label>
+                        <div class="mb-1">
+                            <label for="event-title" class="col-form-label">Event Title</label>
                             <input type="text" class="form-control" id="event-title" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <label for="event-start" class="col-form-label">Start Time</label>
                             <input type="time" class="form-control" id="event-start" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <label for="event-end" class="col-form-label">End Time</label>
                             <input type="time" class="form-control" id="event-end" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <label for="event-color" class="col-form-label">Event Color</label>
-                            <input type="color" class="form-control" id="event-color" />
+                            <input type="color" class="form-control form-control-color" id="event-color" />
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveEventBtn">Save</button>
+                    <button type="button" class="btn" style="background-color: #fafafa; padding: 6px 22px;"
+                        data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn" id="saveEventBtn" style="background-color: #6092bc;
+    color: white;
+    padding: 6px 37px;
+    border-radius: 6px;">Save</button>
                 </div>
             </div>
         </div>
@@ -98,28 +155,32 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Event Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <h5 class="modal-title" id="exampleModalLabel">Event Details</h5>
                 <div class="modal-body">
                     <form id="eventDetailsForm">
-                        <div class="mb-3">
-                            <label for="event-title" class="">Event Title</label>
+                        <div class="mb-1">
+                            <label for="event-title" class="col-form-label">Event Title</label>
                             <input type="text" class="form-control" id="event-details-title" readonly />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <label for="event-start" class="col-form-label">Start Time</label>
                             <input type="text" class="form-control" id="event-details-start" readonly />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <label for="event-end" class="col-form-label">End Time</label>
                             <input type="text" class="form-control" id="event-details-end" readonly />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <label for="event-color" class="col-form-label">Event Color</label>
-                            <input type="color" class="form-control" id="event-details-color" readonly />
+                            <input type="color" class="form-control form-control-color" id="event-details-color" readonly />
                         </div>
                     </form>
+                </div>
+                     <div class="modal-footer">
+                    <button type="button" class="btn" style="background-color: #fafafa; padding: 6px 22px;"
+                        data-bs-dismiss="modal">Ok</button>
                 </div>
             </div>
         </div>
@@ -204,4 +265,5 @@
         });
     </script>
 </body>
+
 </html>
