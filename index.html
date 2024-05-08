@@ -179,8 +179,9 @@
                     </form>
                 </div>
                      <div class="modal-footer">
-                    <button type="button" class="btn" style="background-color: #fafafa; padding: 6px 22px;"
-                        data-bs-dismiss="modal">Ok</button>
+                    <button type="button" class="btn btn-danger" id="deleteEventBtn">Delete</button>
+                <button type="button" class="btn" style="background-color: #fafafa; padding: 6px 22px;"
+                    data-bs-dismiss="modal">Ok</button>
                 </div>
             </div>
         </div>
@@ -194,43 +195,46 @@
             $("#calendar").fullCalendar({
                 selectable: true,
                 selectHelper: true,
-                select: function (start, end) {
-                    $("#addEventModal").modal("toggle");
-                   $("#saveEventBtn").unbind().click(function () {
+            select: function (start, end) {
+    $("#addEventModal").modal("toggle");
+    $("#saveEventBtn").unbind().click(function () {
         var title = $("#event-title").val();
         var startDate = $("#event-start").val();
         var endDate = $("#event-end").val();
         var color = $("#event-color").val();
         if (title && startDate && endDate) {
-                            // var startWithTime = moment(start.format("YYYY-MM-DD") + "T" + startTime).format();
-                            // var endWithTime = moment(start.format("YYYY-MM-DD") + "T" + endTime).format();
-                            var eventData = {
-                                  title: title,
+            var event = {
+                id: Date.now().toString(), // Generate a unique ID
+                title: title,
                 start: startDate,
                 end: endDate,
                 allDay: false,
-                color: color,
-                            };
-                            $("#calendar").fullCalendar("renderEvent", eventData, true);
-                            events.push(eventData);
-                            localStorage.setItem("eventsData", JSON.stringify(events));
-                            $("#addEventModal").modal("hide");
-                            $("#event-title").val("");
-                            $("#event-start").val("");
-                            $("#event-end").val("");
-                            $("#event-color").val("#000000");
-                        } else {
-                            alert("Please provide all the necessary details for the event.");
-                        }
-                    });
-                },
-                eventClick: function (calEvent, jsEvent, view) {
-                    $("#event-details-title").val(calEvent.title);
-                    $("#event-details-start").val(moment(calEvent.start).format("YYYY-MM-DD hh:mm A"));
-                    $("#event-details-end").val(moment(calEvent.end).format("YYYY-MM-DD hh:mm A"));
-                    $("#event-details-color").val(calEvent.color);
-                    $("#eventDetailsModal").modal("show");
-                },
+                color: color
+            };
+            $("#calendar").fullCalendar("renderEvent", event, true);
+            events.push(event); // Push event to the array
+            localStorage.setItem("eventsData", JSON.stringify(events));
+            $("#addEventModal").modal("hide");
+            $("#event-title").val("");
+            $("#event-start").val("");
+            $("#event-end").val("");
+            $("#event-color").val("#000000");
+        } else {
+            alert("Please provide all the necessary details for the event.");
+        }
+    });
+},
+
+
+eventClick: function (calEvent, jsEvent, view) {
+    $("#event-details-title").val(calEvent.title);
+    $("#event-details-start").val(moment(calEvent.start).format("YYYY-MM-DD hh:mm A"));
+    $("#event-details-end").val(moment(calEvent.end).format("YYYY-MM-DD hh:mm A"));
+    $("#event-details-color").val(calEvent.color);
+    $("#deleteEventBtn").data("event-id", calEvent.id); // Use FullCalendar's event ID
+    $("#eventDetailsModal").modal("show");
+},
+
                 header: {
                     left: "month, agendaWeek, agendaDay, list",
                     center: "title",
@@ -257,7 +261,23 @@
                     var eventTime = $("<div class='fc-event-time'></div>").text(moment(event.start).format("hh:mm A"));
                     // $(element).append(eventTime).append(eventTitle);
                 }
+                
             });
+$(document).on("click", "#deleteEventBtn", function () {
+    var eventId = $(this).data("event-id"); // Get event ID from data attribute
+    var eventToDeleteIndex = events.findIndex(event => event.id === eventId); // Find index of event in array
+    if (eventToDeleteIndex !== -1) {
+        // Remove event from FullCalendar
+        $("#calendar").fullCalendar("removeEvents", eventId);
+        // Remove event from events array
+        events.splice(eventToDeleteIndex, 1);
+        // Update local storage
+        localStorage.setItem("eventsData", JSON.stringify(events));
+        // Hide modal
+        $("#eventDetailsModal").modal("hide");
+    }
+});
+
 
             function updateEventsData() {
                 localStorage.setItem("eventsData", JSON.stringify(events));
